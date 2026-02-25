@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 
-call mvn test-compile org.pitest:pitest-maven:mutationCoverage > nul 2>&1
+call mvn clean test org.pitest:pitest-maven:mutationCoverage > nul 2>&1
 set "EC=%ERRORLEVEL%"
 
 if "%EC%"=="0" (

@@ -3,7 +3,7 @@ setlocal EnableExtensions
 
 set "LOG=%TEMP%\mvn_test_%RANDOM%.log"
 
-call mvn test > "%LOG%" 2>&1
+call mvn clean test > "%LOG%" 2>&1
 set "EC=%ERRORLEVEL%"
 
 if "%EC%"=="0" (

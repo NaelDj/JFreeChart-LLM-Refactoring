@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>G2TextMeasurer.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>/* ======================================================</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * JFreeChart : a chart library for the Java(tm) platform</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * ======================================================</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * (C) Copyright 2000-present, by David Gilbert and Contributors.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Project Info:  https://www.jfree.org/jfreechart/index.html</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * This library is free software; you can redistribute it and/or modify it</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * under the terms of the GNU Lesser General Public License as published by</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * the Free Software Foundation; either version 2.1 of the License, or</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * (at your option) any later version.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * This library is distributed in the hope that it will be useful, but</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * License for more details.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * You should have received a copy of the GNU Lesser General Public</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * License along with this library; if not, write to the Free Software</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * USA.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. </span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Other names may be trademarks of their respective owners.]</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_26'/>
+26
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_26'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package org.jfree.chart.text;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_30'/>
+30
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_30'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_31'/>
+31
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_31'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.awt.FontMetrics;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_32'/>
+32
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_32'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.awt.Graphics2D;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_33'/>
+33
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_33'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.awt.geom.Rectangle2D;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_34'/>
+34
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_34'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_35'/>
+35
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_35'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>/**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_36'/>
+36
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_36'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * A {@link TextMeasurer} based on a {@link Graphics2D}.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_37'/>
+37
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_37'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_38'/>
+38
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_38'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>public class G2TextMeasurer implements TextMeasurer {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_39'/>
+39
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_39'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_40'/>
+40
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_40'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /** The graphics device. */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_41'/>
+41
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_41'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private Graphics2D g2;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_42'/>
+42
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_42'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    </span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_43'/>
+43
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_43'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_44'/>
+44
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_44'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * Creates a new text measurer.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_45'/>
+45
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_45'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * </span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_46'/>
+46
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_46'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param g2  the graphics device.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_47'/>
+47
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_47'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_48'/>
+48
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_48'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    public G2TextMeasurer(Graphics2D g2) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_49'/>
+49
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_49'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.g2 = g2;</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_50'/>
+50
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_50'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_51'/>
+51
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_51'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_52'/>
+52
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_52'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_53'/>
+53
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_53'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * Returns the string width.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_54'/>
+54
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_54'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * </span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_55'/>
+55
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_55'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param text  the text.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_56'/>
+56
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_56'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param start  the index of the first character to measure.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_57'/>
+57
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_57'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param end  the index of the last character to measure.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_58'/>
+58
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_58'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * </span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_59'/>
+59
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_59'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @return The string width.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_60'/>
+60
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_60'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_61'/>
+61
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_61'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Override</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_62'/>
+62
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_62'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public float getStringWidth(String text, int start, int end) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_63'/>
+63
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_63'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        FontMetrics fm = this.g2.getFontMetrics();</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_64'/>
+64
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_64'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Rectangle2D bounds = TextUtils.getTextBounds(text.substring(start, end),</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_65'/>
+65
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_65'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                this.g2, fm);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_66'/>
+66
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_66'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        float result = (float) bounds.getWidth();</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_67'/>
+67
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_67'>1</a>
+<span>
+
+1. getStringWidth : replaced float return with 0.0f for org/jfree/chart/text/G2TextMeasurer::getStringWidth &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        return result;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_68'/>
+68
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_68'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_69'/>
+69
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_69'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    </span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_70'/>
+70
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_70'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@380f161a_71'/>
+71
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_71'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@380f161a_67'>67</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@380f161a_67'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getStringWidth<br/><b>Killed by : </b>none</span></span> replaced float return with 0.0f for org/jfree/chart/text/G2TextMeasurer::getStringWidth &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=org.jfree.chart.text.G2TextMeasurer,-method=getStringWidth,-methodDesc=(Ljava/lang/String;II)F],-indexes=[27],-mutator=org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=org.jfree.chart.text.G2TextMeasurer,-method=getStringWidth,-methodDesc=(Ljava/lang/String;II)F],-indexes=[27],-mutator=org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=org.jfree.chart.text.G2TextMeasurer,-method=getStringWidth,-methodDesc=(Ljava/lang/String;II)F],-indexes=[27],-mutator=org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>org.jfree.chart.plot.PiePlot3DTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.PiePlot3DTest]/[method:testDrawWithNullDataset()]</li> <li>org.jfree.chart.plot.PiePlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.PiePlotTest]/[method:testDrawWithNullLegendLabels()]</li> <li>org.jfree.chart.StackedAreaChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.StackedAreaChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:testDrawSeriesWithZeroItems()]</li> <li>org.jfree.chart.StackedBarChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.StackedBarChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.BarChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.BarChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.XYLineChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYLineChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.plot.CategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CategoryPlotTest]/[method:test1654215()]</li> <li>org.jfree.chart.WaterfallChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.WaterfallChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:testDrawRangeGridlines()]</li> <li>org.jfree.chart.XYAreaChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYAreaChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.LineChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.LineChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.XYBarChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYBarChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.ScatterPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.ScatterPlotTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:test1654215()]</li> <li>org.jfree.chart.axis.SubCategoryAxisTest.[engine:junit-jupiter]/[class:org.jfree.chart.axis.SubCategoryAxisTest]/[method:test2275695()]</li> <li>org.jfree.chart.PieChart3DTest.[engine:junit-jupiter]/[class:org.jfree.chart.PieChart3DTest]/[method:testNullValueInDataset()]</li> <li>org.jfree.chart.axis.ValueAxisTest.[engine:junit-jupiter]/[class:org.jfree.chart.axis.ValueAxisTest]/[method:test3555275()]</li> <li>org.jfree.chart.renderer.xy.StackedXYAreaRenderer2Test.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.xy.StackedXYAreaRenderer2Test]/[method:testDrawWithEmptyDataset()]</li> <li>org.jfree.chart.XYStepAreaChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYStepAreaChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.TimeSeriesChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.TimeSeriesChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.renderer.category.MinMaxCategoryRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.MinMaxCategoryRendererTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.plot.CombinedDomainCategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CombinedDomainCategoryPlotTest]/[method:testNotification()]</li> <li>org.jfree.chart.renderer.category.LayeredBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.LayeredBarRendererTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.renderer.category.LevelRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.LevelRendererTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.XYStepChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYStepChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.renderer.xy.StandardXYItemRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.xy.StandardXYItemRendererTest]/[method:testNoDisplayedItem()]</li> <li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullMeanVertical()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMedian()]</li> <li>org.jfree.chart.renderer.category.StatisticalLineAndShapeRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalLineAndShapeRendererTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullDeviationHorizontal()]</li> <li>org.jfree.chart.renderer.category.IntervalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.IntervalBarRendererTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullMeanHorizontal()]</li> <li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullDeviationVertical()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullQ1()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullQ3()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMinOutlier()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testBug1572478Horizontal()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMaxOutlier()]</li> <li>org.jfree.chart.renderer.category.GroupedStackedBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.GroupedStackedBarRendererTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMean()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMaxRegular()]</li> <li>org.jfree.chart.plot.CategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CategoryPlotTest]/[method:testSerialization3()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMinRegular()]</li> <li>org.jfree.chart.annotations.XYTitleAnnotationTest.[engine:junit-jupiter]/[class:org.jfree.chart.annotations.XYTitleAnnotationTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.plot.CombinedRangeCategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CombinedRangeCategoryPlotTest]/[method:testNotification()]</li> <li>org.jfree.chart.renderer.xy.XYBoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.xy.XYBoxAndWhiskerRendererTest]/[method:test2909215()]</li> <li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:testSerialization4()]</li> <li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:testSerialization3()]</li> <li>org.jfree.chart.plot.CategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CategoryPlotTest]/[method:testSerialization4()]</li> <li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testBug1572478Vertical()]</li> <li>org.jfree.chart.GanttChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.GanttChartTest]/[method:testDrawWithNullInfo2()]</li> <li>org.jfree.chart.AreaChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.AreaChartTest]/[method:testDrawWithNullInfo()]</li> <li>org.jfree.chart.GanttChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.GanttChartTest]/[method:testDrawWithNullInfo()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+
+<li class='mutator'>EMPTY_RETURNS</li>
+
+<li class='mutator'>FALSE_RETURNS</li>
+
+<li class='mutator'>INCREMENTS</li>
+
+<li class='mutator'>INVERT_NEGS</li>
+
+<li class='mutator'>MATH</li>
+
+<li class='mutator'>NEGATE_CONDITIONALS</li>
+
+<li class='mutator'>NULL_RETURNS</li>
+
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+
+<li class='mutator'>TRUE_RETURNS</li>
+
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>org.jfree.chart.plot.PiePlot3DTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.PiePlot3DTest]/[method:testDrawWithNullDataset()] (4 ms)</li><li>org.jfree.chart.plot.PiePlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.PiePlotTest]/[method:testDrawWithNullLegendLabels()] (12 ms)</li><li>org.jfree.chart.StackedAreaChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.StackedAreaChartTest]/[method:testDrawWithNullInfo()] (12 ms)</li><li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:testDrawSeriesWithZeroItems()] (11 ms)</li><li>org.jfree.chart.StackedBarChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.StackedBarChartTest]/[method:testDrawWithNullInfo()] (16 ms)</li><li>org.jfree.chart.BarChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.BarChartTest]/[method:testDrawWithNullInfo()] (15 ms)</li><li>org.jfree.chart.XYLineChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYLineChartTest]/[method:testDrawWithNullInfo()] (3 ms)</li><li>org.jfree.chart.plot.CategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CategoryPlotTest]/[method:test1654215()] (5 ms)</li><li>org.jfree.chart.WaterfallChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.WaterfallChartTest]/[method:testDrawWithNullInfo()] (17 ms)</li><li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:testDrawRangeGridlines()] (7 ms)</li><li>org.jfree.chart.XYAreaChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYAreaChartTest]/[method:testDrawWithNullInfo()] (9 ms)</li><li>org.jfree.chart.LineChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.LineChartTest]/[method:testDrawWithNullInfo()] (32 ms)</li><li>org.jfree.chart.XYBarChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYBarChartTest]/[method:testDrawWithNullInfo()] (20 ms)</li><li>org.jfree.chart.ScatterPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.ScatterPlotTest]/[method:testDrawWithNullInfo()] (13 ms)</li><li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:test1654215()] (8 ms)</li><li>org.jfree.chart.axis.SubCategoryAxisTest.[engine:junit-jupiter]/[class:org.jfree.chart.axis.SubCategoryAxisTest]/[method:test2275695()] (34 ms)</li><li>org.jfree.chart.PieChart3DTest.[engine:junit-jupiter]/[class:org.jfree.chart.PieChart3DTest]/[method:testNullValueInDataset()] (84 ms)</li><li>org.jfree.chart.axis.ValueAxisTest.[engine:junit-jupiter]/[class:org.jfree.chart.axis.ValueAxisTest]/[method:test3555275()] (22 ms)</li><li>org.jfree.chart.renderer.xy.StackedXYAreaRenderer2Test.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.xy.StackedXYAreaRenderer2Test]/[method:testDrawWithEmptyDataset()] (11 ms)</li><li>org.jfree.chart.XYStepAreaChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYStepAreaChartTest]/[method:testDrawWithNullInfo()] (40 ms)</li><li>org.jfree.chart.TimeSeriesChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.TimeSeriesChartTest]/[method:testDrawWithNullInfo()] (14 ms)</li><li>org.jfree.chart.renderer.category.MinMaxCategoryRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.MinMaxCategoryRendererTest]/[method:testDrawWithNullInfo()] (8 ms)</li><li>org.jfree.chart.plot.CombinedDomainCategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CombinedDomainCategoryPlotTest]/[method:testNotification()] (41 ms)</li><li>org.jfree.chart.renderer.category.LayeredBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.LayeredBarRendererTest]/[method:testDrawWithNullInfo()] (6 ms)</li><li>org.jfree.chart.renderer.category.LevelRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.LevelRendererTest]/[method:testDrawWithNullInfo()] (7 ms)</li><li>org.jfree.chart.XYStepChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.XYStepChartTest]/[method:testDrawWithNullInfo()] (27 ms)</li><li>org.jfree.chart.renderer.xy.StandardXYItemRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.xy.StandardXYItemRendererTest]/[method:testNoDisplayedItem()] (12 ms)</li><li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullMeanVertical()] (6 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMedian()] (17 ms)</li><li>org.jfree.chart.renderer.category.StatisticalLineAndShapeRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalLineAndShapeRendererTest]/[method:testDrawWithNullInfo()] (9 ms)</li><li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullDeviationHorizontal()] (7 ms)</li><li>org.jfree.chart.renderer.category.IntervalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.IntervalBarRendererTest]/[method:testDrawWithNullInfo()] (13 ms)</li><li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullMeanHorizontal()] (11 ms)</li><li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullInfo()] (15 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullInfo()] (13 ms)</li><li>org.jfree.chart.renderer.category.StatisticalBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.StatisticalBarRendererTest]/[method:testDrawWithNullDeviationVertical()] (17 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullQ1()] (8 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullQ3()] (9 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMinOutlier()] (5 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testBug1572478Horizontal()] (5 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMaxOutlier()] (7 ms)</li><li>org.jfree.chart.renderer.category.GroupedStackedBarRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.GroupedStackedBarRendererTest]/[method:testDrawWithNullInfo()] (33 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMean()] (11 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMaxRegular()] (18 ms)</li><li>org.jfree.chart.plot.CategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CategoryPlotTest]/[method:testSerialization3()] (23 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testDrawWithNullMinRegular()] (36 ms)</li><li>org.jfree.chart.annotations.XYTitleAnnotationTest.[engine:junit-jupiter]/[class:org.jfree.chart.annotations.XYTitleAnnotationTest]/[method:testDrawWithNullInfo()] (22 ms)</li><li>org.jfree.chart.plot.CombinedRangeCategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CombinedRangeCategoryPlotTest]/[method:testNotification()] (39 ms)</li><li>org.jfree.chart.renderer.xy.XYBoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.xy.XYBoxAndWhiskerRendererTest]/[method:test2909215()] (36 ms)</li><li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:testSerialization4()] (12 ms)</li><li>org.jfree.chart.plot.XYPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.XYPlotTest]/[method:testSerialization3()] (44 ms)</li><li>org.jfree.chart.plot.CategoryPlotTest.[engine:junit-jupiter]/[class:org.jfree.chart.plot.CategoryPlotTest]/[method:testSerialization4()] (34 ms)</li><li>org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest.[engine:junit-jupiter]/[class:org.jfree.chart.renderer.category.BoxAndWhiskerRendererTest]/[method:testBug1572478Vertical()] (110 ms)</li><li>org.jfree.chart.GanttChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.GanttChartTest]/[method:testDrawWithNullInfo2()] (136 ms)</li><li>org.jfree.chart.AreaChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.AreaChartTest]/[method:testDrawWithNullInfo()] (597 ms)</li><li>org.jfree.chart.GanttChartTest.[engine:junit-jupiter]/[class:org.jfree.chart.GanttChartTest]/[method:testDrawWithNullInfo()] (909 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.21.1
+
+</body>
+</html>

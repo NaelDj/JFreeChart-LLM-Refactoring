@@ -2825,14 +2825,29 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
      * @param info  collects chart drawing information ({@code null}
      *              permitted).
      */
+    /**
+     * Checks if the drawing area is too small to render the plot.
+     * A plot area is considered too small if either its width is at or below
+     * the minimum width threshold or its height is at or below the minimum height threshold.
+     *
+     * @param area the area to check ({@code null} not permitted).
+     * @return {@code true} if the area is too small to draw, {@code false} otherwise.
+     */
+    protected boolean isAreaTooSmallToDraw(Rectangle2D area) {
+        if (area == null) {
+            throw new IllegalArgumentException("Null 'area' argument.");
+        }
+        boolean widthTooSmall = (area.getWidth() <= MINIMUM_WIDTH_TO_DRAW);
+        boolean heightTooSmall = (area.getHeight() <= MINIMUM_HEIGHT_TO_DRAW);
+        return widthTooSmall || heightTooSmall;
+    }
+
     @Override
     public void draw(Graphics2D g2, Rectangle2D area, Point2D anchor,
             PlotState parentState, PlotRenderingInfo info) {
 
         // if the plot area is too small, just return...
-        boolean b1 = (area.getWidth() <= MINIMUM_WIDTH_TO_DRAW);
-        boolean b2 = (area.getHeight() <= MINIMUM_HEIGHT_TO_DRAW);
-        if (b1 || b2) {
+        if (isAreaTooSmallToDraw(area)) {
             return;
         }
 

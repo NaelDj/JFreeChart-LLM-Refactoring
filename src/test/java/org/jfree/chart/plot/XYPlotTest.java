@@ -1411,5 +1411,70 @@ public class XYPlotTest {
         s2.add(Double.NaN, 0.5); 
         assertEquals(new Range(1.0, 6.0), plot.getDataRange(xAxis));
         assertEquals(new Range(2.0, 10.0), plot.getDataRange(yAxis)); // only y-values for items in the x-range        
-    }    
+    }
+
+    /**
+     * Tests for the isAreaTooSmallToDraw() method to ensure correct boundary
+     * checking and logical OR behavior for dimension validation.
+     */
+    @Test
+    public void testIsAreaTooSmallToDraw() {
+        XYPlot plot = new XYPlot();
+        
+        // Test with null area - should throw exception
+        try {
+            plot.isAreaTooSmallToDraw(null);
+            fail("Expected IllegalArgumentException for null area");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        
+        // Test with area larger than minimums - should return false
+        Rectangle2D largeArea = new Rectangle2D.Double(0, 0, 100, 100);
+        assertFalse(plot.isAreaTooSmallToDraw(largeArea));
+        
+        // Test with width exactly at minimum (10.0) - should return true (<=)
+        Rectangle2D widthAtMin = new Rectangle2D.Double(0, 0, 10.0, 100);
+        assertTrue(plot.isAreaTooSmallToDraw(widthAtMin));
+        
+        // Test with width just below minimum - should return true
+        Rectangle2D widthBelowMin = new Rectangle2D.Double(0, 0, 9.0, 100);
+        assertTrue(plot.isAreaTooSmallToDraw(widthBelowMin));
+        
+        // Test with width just above minimum - should return false
+        Rectangle2D widthAboveMin = new Rectangle2D.Double(0, 0, 11.0, 100);
+        assertFalse(plot.isAreaTooSmallToDraw(widthAboveMin));
+        
+        // Test with height exactly at minimum (10.0) - should return true (<=)
+        Rectangle2D heightAtMin = new Rectangle2D.Double(0, 0, 100, 10.0);
+        assertTrue(plot.isAreaTooSmallToDraw(heightAtMin));
+        
+        // Test with height just below minimum - should return true
+        Rectangle2D heightBelowMin = new Rectangle2D.Double(0, 0, 100, 9.0);
+        assertTrue(plot.isAreaTooSmallToDraw(heightBelowMin));
+        
+        // Test with height just above minimum - should return false
+        Rectangle2D heightAboveMin = new Rectangle2D.Double(0, 0, 100, 11.0);
+        assertFalse(plot.isAreaTooSmallToDraw(heightAboveMin));
+        
+        // Test with both dimensions at minimum - should return true (tests OR logic)
+        Rectangle2D bothAtMin = new Rectangle2D.Double(0, 0, 10.0, 10.0);
+        assertTrue(plot.isAreaTooSmallToDraw(bothAtMin));
+        
+        // Test with both dimensions below minimum - should return true
+        Rectangle2D bothBelowMin = new Rectangle2D.Double(0, 0, 5.0, 5.0);
+        assertTrue(plot.isAreaTooSmallToDraw(bothBelowMin));
+        
+        // Test with width below minimum but height above - should return true (OR logic)
+        Rectangle2D widthSmallHeightLarge = new Rectangle2D.Double(0, 0, 5.0, 100);
+        assertTrue(plot.isAreaTooSmallToDraw(widthSmallHeightLarge));
+        
+        // Test with width above minimum but height below - should return true (OR logic)
+        Rectangle2D widthLargeHeightSmall = new Rectangle2D.Double(0, 0, 100, 5.0);
+        assertTrue(plot.isAreaTooSmallToDraw(widthLargeHeightSmall));
+        
+        // Test with zero dimensions - should return true
+        Rectangle2D zeroArea = new Rectangle2D.Double(0, 0, 0, 0);
+        assertTrue(plot.isAreaTooSmallToDraw(zeroArea));
+    }
 }

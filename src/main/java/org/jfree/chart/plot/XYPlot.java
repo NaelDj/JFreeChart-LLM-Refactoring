@@ -399,6 +399,11 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
     private ShadowGenerator shadowGenerator;
 
     /**
+     * Records drawing operations for testing and observability.
+     */
+    private DrawingOperations lastDrawingOperations;
+
+    /**
      * Creates a new {@code XYPlot} instance with no dataset, no axes and
      * no renderer.  You should specify these items before using the plot.
      */
@@ -2680,6 +2685,16 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
     }
 
     /**
+     * Returns the drawing operations that were recorded during the last draw() call.
+     * This is useful for testing to verify that expected drawing operations occurred.
+     *
+     * @return The drawing operations (possibly {@code null} if draw() has not been called yet).
+     */
+    public DrawingOperations getLastDrawingOperations() {
+        return this.lastDrawingOperations;
+    }
+
+    /**
      * Sets the shadow generator for the plot and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
@@ -2829,6 +2844,9 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
     public void draw(Graphics2D g2, Rectangle2D area, Point2D anchor,
             PlotState parentState, PlotRenderingInfo info) {
 
+        // Initialize drawing operations tracker for observability
+        this.lastDrawingOperations = new DrawingOperations();
+
         // if the plot area is too small, just return...
         boolean b1 = (area.getWidth() <= MINIMUM_WIDTH_TO_DRAW);
         boolean b2 = (area.getHeight() <= MINIMUM_HEIGHT_TO_DRAW);
@@ -2839,6 +2857,7 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
         // record the plot area...
         if (info != null) {
             info.setPlotArea(area);
+            this.lastDrawingOperations.recordOperation("setPlotArea");
         }
 
         // adjust the drawing area for the plot insets (if any)...
@@ -2856,10 +2875,12 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
         createAndAddEntity((Rectangle2D) dataArea.clone(), info, null, null);
         if (info != null) {
             info.setDataArea(dataArea);
+            this.lastDrawingOperations.recordOperation("setDataArea");
         }
 
         // draw the plot background and axes...
         drawBackground(g2, dataArea);
+        this.lastDrawingOperations.recordBackgroundDrawn();
         Map<Axis, AxisState> axisStateMap = drawAxes(g2, area, dataArea, info);
 
         PlotOrientation orient = getOrientation();
@@ -2935,10 +2956,12 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
         }
         if (domainAxisState != null) {
             drawDomainGridlines(g2, dataArea, domainAxisState.getTicks());
+            this.lastDrawingOperations.recordDomainGridlinesDrawn();
             drawZeroDomainBaseline(g2, dataArea);
         }
         if (rangeAxisState != null) {
             drawRangeGridlines(g2, dataArea, rangeAxisState.getTicks());
+            this.lastDrawingOperations.recordRangeGridlinesDrawn();
             drawZeroRangeBaseline(g2, dataArea);
         }
 
@@ -2958,10 +2981,12 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
         for (XYDataset dataset: this.datasets.values()) {
             int datasetIndex = indexOf(dataset);
             drawDomainMarkers(g2, dataArea, datasetIndex, Layer.BACKGROUND);
+            this.lastDrawingOperations.recordDomainMarkersDrawn(Layer.BACKGROUND.ordinal());
         }
         for (XYDataset dataset: this.datasets.values()) {
             int datasetIndex = indexOf(dataset);
             drawRangeMarkers(g2, dataArea, datasetIndex, Layer.BACKGROUND);
+            this.lastDrawingOperations.recordRangeMarkersDrawn(Layer.BACKGROUND.ordinal());
         }
 
         // now draw annotations and render data items...
@@ -3047,12 +3072,15 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
 
         for (int i : rendererIndices) { 
             drawDomainMarkers(g2, dataArea, i, Layer.FOREGROUND);
+            this.lastDrawingOperations.recordDomainMarkersDrawn(Layer.FOREGROUND.ordinal());
         }
         for (int i : rendererIndices) {
             drawRangeMarkers(g2, dataArea, i, Layer.FOREGROUND);
+            this.lastDrawingOperations.recordRangeMarkersDrawn(Layer.FOREGROUND.ordinal());
         }
 
         drawAnnotations(g2, dataArea, info);
+        this.lastDrawingOperations.recordAnnotationsDrawn();
         if (this.shadowGenerator != null && !suppressShadow) {
             BufferedImage shadowImage
                     = this.shadowGenerator.createDropShadow(dataImage);

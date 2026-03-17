@@ -1411,5 +1411,224 @@ public class XYPlotTest {
         s2.add(Double.NaN, 0.5); 
         assertEquals(new Range(1.0, 6.0), plot.getDataRange(xAxis));
         assertEquals(new Range(2.0, 10.0), plot.getDataRange(yAxis)); // only y-values for items in the x-range        
-    }    
+    }
+    
+    /**
+     * Tests that drawing operations are recorded when draw() is called.
+     * This test targets surviving mutants from VoidMethodCallMutator that removed
+     * calls to info.setPlotArea() and info.setDataArea().
+     */
+    @Test
+    public void testDrawRecordsPlotRenderingInfoOperations() {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 2.0);
+        series.add(2.0, 3.0);
+        dataset.addSeries(series);
+        
+        NumberAxis xAxis = new NumberAxis("X");
+        NumberAxis yAxis = new NumberAxis("Y");
+        XYItemRenderer renderer = new XYLineAndShapeRenderer();
+        XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        PlotRenderingInfo info = new PlotRenderingInfo(null);
+        
+        plot.draw(g2, area, null, null, info);
+        
+        DrawingOperations ops = plot.getLastDrawingOperations();
+        assertNotNull(ops, "Drawing operations should be recorded");
+        assertTrue(ops.containsOperation("setPlotArea"), 
+                "setPlotArea should have been called on PlotRenderingInfo");
+        assertTrue(ops.containsOperation("setDataArea"),
+                "setDataArea should have been called on PlotRenderingInfo");
+        
+        g2.dispose();
+    }
+    
+    /**
+     * Tests that background drawing is recorded.
+     * This targets surviving mutants that removed the drawBackground() call.
+     */
+    @Test
+    public void testDrawRecordsBackgroundDrawn() {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 2.0);
+        dataset.addSeries(series);
+        
+        NumberAxis xAxis = new NumberAxis("X");
+        NumberAxis yAxis = new NumberAxis("Y");
+        XYItemRenderer renderer = new XYLineAndShapeRenderer();
+        XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        plot.draw(g2, area, null, null, null);
+        
+        DrawingOperations ops = plot.getLastDrawingOperations();
+        assertNotNull(ops);
+        assertTrue(ops.wasBackgroundDrawn(), 
+                "Background should have been drawn");
+        
+        g2.dispose();
+    }
+    
+    /**
+     * Tests that gridline drawing is recorded.
+     * This targets surviving mutants that removed drawDomainGridlines() 
+     * and drawRangeGridlines() calls.
+     */
+    @Test
+    public void testDrawRecordsGridlinesDrawn() {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 2.0);
+        series.add(2.0, 3.0);
+        dataset.addSeries(series);
+        
+        NumberAxis xAxis = new NumberAxis("X");
+        NumberAxis yAxis = new NumberAxis("Y");
+        XYItemRenderer renderer = new XYLineAndShapeRenderer();
+        XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
+        
+        // Enable gridlines
+        plot.setDomainGridlinesVisible(true);
+        plot.setRangeGridlinesVisible(true);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        plot.draw(g2, area, null, null, null);
+        
+        DrawingOperations ops = plot.getLastDrawingOperations();
+        assertNotNull(ops);
+        assertTrue(ops.wereDomainGridlinesDrawn(), 
+                "Domain gridlines should have been drawn");
+        assertTrue(ops.wereRangeGridlinesDrawn(),
+                "Range gridlines should have been drawn");
+        
+        g2.dispose();
+    }
+    
+    /**
+     * Tests that marker drawing is recorded for both background and foreground layers.
+     * This targets surviving mutants that removed drawDomainMarkers() 
+     * and drawRangeMarkers() calls.
+     */
+    @Test
+    public void testDrawRecordsMarkersDrawn() {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 2.0);
+        series.add(2.0, 3.0);
+        dataset.addSeries(series);
+        
+        NumberAxis xAxis = new NumberAxis("X");
+        NumberAxis yAxis = new NumberAxis("Y");
+        XYItemRenderer renderer = new XYLineAndShapeRenderer();
+        XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
+        
+        // Add markers
+        plot.addDomainMarker(new ValueMarker(1.5), Layer.BACKGROUND);
+        plot.addRangeMarker(new ValueMarker(2.5), Layer.BACKGROUND);
+        plot.addDomainMarker(new ValueMarker(1.7), Layer.FOREGROUND);
+        plot.addRangeMarker(new ValueMarker(2.7), Layer.FOREGROUND);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        plot.draw(g2, area, null, null, null);
+        
+        DrawingOperations ops = plot.getLastDrawingOperations();
+        assertNotNull(ops);
+        
+        // Check background markers were drawn
+        assertTrue(ops.containsOperation("drawDomainMarkers_" + Layer.BACKGROUND.ordinal()),
+                "Background domain markers should have been drawn");
+        assertTrue(ops.containsOperation("drawRangeMarkers_" + Layer.BACKGROUND.ordinal()),
+                "Background range markers should have been drawn");
+        
+        // Check foreground markers were drawn
+        assertTrue(ops.containsOperation("drawDomainMarkers_" + Layer.FOREGROUND.ordinal()),
+                "Foreground domain markers should have been drawn");
+        assertTrue(ops.containsOperation("drawRangeMarkers_" + Layer.FOREGROUND.ordinal()),
+                "Foreground range markers should have been drawn");
+        
+        g2.dispose();
+    }
+    
+    /**
+     * Tests that annotation drawing is recorded.
+     * This targets surviving mutants that removed the drawAnnotations() call.
+     */
+    @Test
+    public void testDrawRecordsAnnotationsDrawn() {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 2.0);
+        series.add(2.0, 3.0);
+        dataset.addSeries(series);
+        
+        NumberAxis xAxis = new NumberAxis("X");
+        NumberAxis yAxis = new NumberAxis("Y");
+        XYItemRenderer renderer = new XYLineAndShapeRenderer();
+        XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
+        
+        // Add an annotation
+        plot.addAnnotation(new XYTextAnnotation("Test", 1.5, 2.5));
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        plot.draw(g2, area, null, null, null);
+        
+        DrawingOperations ops = plot.getLastDrawingOperations();
+        assertNotNull(ops);
+        assertTrue(ops.wereAnnotationsDrawn(),
+                "Annotations should have been drawn");
+        
+        g2.dispose();
+    }
+    
+    /**
+     * Tests that drawing operations tracker is reset for each draw() call.
+     * This ensures we're testing current behavior, not stale state.
+     */
+    @Test
+    public void testDrawOperationsResetOnEachDraw() {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 2.0);
+        dataset.addSeries(series);
+        
+        NumberAxis xAxis = new NumberAxis("X");
+        NumberAxis yAxis = new NumberAxis("Y");
+        XYItemRenderer renderer = new XYLineAndShapeRenderer();
+        XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        // First draw
+        plot.draw(g2, area, null, null, null);
+        DrawingOperations ops1 = plot.getLastDrawingOperations();
+        assertNotNull(ops1);
+        
+        // Second draw should create a new operations tracker
+        plot.draw(g2, area, null, null, null);
+        DrawingOperations ops2 = plot.getLastDrawingOperations();
+        assertNotNull(ops2);
+        assertNotSame(ops1, ops2, "Each draw() should create a new operations tracker");
+        
+        g2.dispose();
+    }
 }

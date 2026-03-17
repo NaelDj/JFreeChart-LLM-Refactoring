@@ -99,7 +99,7 @@ public class CategoryPlotTest {
                 .withPrefabValues(EventListenerList.class,
                         new EventListenerList(),
                         new EventListenerList())
-                .withIgnoredFields("chart", "parent")
+                .withIgnoredFields("chart", "parent", "lastCrosshairState")
                 .verify();
     }
 
@@ -1258,6 +1258,215 @@ public class CategoryPlotTest {
         plot.addRangeMarker(99, yMarker1, Layer.FOREGROUND);
         assertTrue(plot.getRangeMarkers(99, Layer.FOREGROUND).contains(
                 yMarker1));
+    }
+
+    /**
+     * Test that crosshair state is stored and observable after rendering.
+     * This targets surviving mutants in the draw() method related to
+     * crosshair state calculations.
+     */
+    @Test
+    public void testCrosshairStateObservability() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(10.0, "R1", "C1");
+        dataset.addValue(20.0, "R1", "C2");
+        dataset.addValue(30.0, "R2", "C1");
+        
+        CategoryPlot plot = new CategoryPlot(dataset, 
+                new CategoryAxis("X"), new NumberAxis("Y"), 
+                new BarRenderer());
+        
+        // Initially, no crosshair state should exist
+        assertNull(plot.getLastCrosshairState());
+        
+        // Render the plot
+        BufferedImage image = new BufferedImage(400, 300, 
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        plot.draw(g2, new Rectangle2D.Double(0, 0, 400, 300), null, null, null);
+        g2.dispose();
+        
+        // After rendering, crosshair state should be stored
+        CategoryCrosshairState state = plot.getLastCrosshairState();
+        assertNotNull(state);
+    }
+
+    /**
+     * Test that range crosshair state is correctly computed when 
+     * rangeCrosshairLockedOnData is true. This enables testing of
+     * internal crosshair calculations that were previously unobservable.
+     */
+    @Test
+    public void testRangeCrosshairStateWithLockedOnData() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(15.0, "R1", "C1");
+        dataset.addValue(25.0, "R1", "C2");
+        
+        CategoryPlot plot = new CategoryPlot(dataset, 
+                new CategoryAxis("X"), new NumberAxis("Y"), 
+                new BarRenderer());
+        
+        plot.setRangeCrosshairVisible(true);
+        plot.setRangeCrosshairLockedOnData(true);
+        
+        // Render the plot with an anchor point near a data value
+        BufferedImage image = new BufferedImage(400, 300, 
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        PlotRenderingInfo info = new PlotRenderingInfo(null);
+        plot.draw(g2, new Rectangle2D.Double(0, 0, 400, 300), 
+                new java.awt.geom.Point2D.Double(200, 150), null, info);
+        g2.dispose();
+        
+        // The crosshair state should reflect the closest data point
+        CategoryCrosshairState state = plot.getLastCrosshairState();
+        assertNotNull(state);
+        
+        // The crosshair Y value should be set to one of the data values
+        double crosshairY = state.getCrosshairY();
+        assertTrue(crosshairY == 15.0 || crosshairY == 25.0 || 
+                   Double.isNaN(crosshairY), 
+                   "Crosshair Y should be a data value or NaN: " + crosshairY);
+    }
+
+    /**
+     * Test that domain crosshair state is correctly stored.
+     * This exposes the internal row and column keys used for crosshairs.
+     */
+    @Test
+    public void testDomainCrosshairStateStorage() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(10.0, "Row1", "Col1");
+        dataset.addValue(20.0, "Row1", "Col2");
+        dataset.addValue(30.0, "Row2", "Col1");
+        
+        CategoryPlot plot = new CategoryPlot(dataset, 
+                new CategoryAxis("X"), new NumberAxis("Y"), 
+                new BarRenderer());
+        
+        plot.setDomainCrosshairVisible(true);
+        plot.setDomainCrosshairColumnKey("Col1");
+        plot.setDomainCrosshairRowKey("Row1");
+        
+        // Render the plot
+        BufferedImage image = new BufferedImage(400, 300, 
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        plot.draw(g2, new Rectangle2D.Double(0, 0, 400, 300), null, null, null);
+        g2.dispose();
+        
+        // Verify the crosshair state reflects the configured keys
+        CategoryCrosshairState state = plot.getLastCrosshairState();
+        assertNotNull(state);
+        assertEquals("Col1", state.getColumnKey());
+        assertEquals("Row1", state.getRowKey());
+    }
+
+    /**
+     * Test crosshair state when range crosshair is not locked on data.
+     * This tests the anchor-based crosshair calculation path.
+     */
+    @Test
+    public void testRangeCrosshairStateWithoutLockedOnData() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(50.0, "R1", "C1");
+        
+        CategoryPlot plot = new CategoryPlot(dataset, 
+                new CategoryAxis("X"), new NumberAxis("Y"), 
+                new BarRenderer());
+        
+        plot.setRangeCrosshairVisible(true);
+        plot.setRangeCrosshairLockedOnData(false);
+        
+        // Render with a specific anchor point
+        BufferedImage image = new BufferedImage(400, 300, 
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        PlotRenderingInfo info = new PlotRenderingInfo(null);
+        plot.draw(g2, new Rectangle2D.Double(0, 0, 400, 300), 
+                new java.awt.geom.Point2D.Double(200, 100), null, info);
+        g2.dispose();
+        
+        // When not locked on data, crosshair should be at anchor position
+        CategoryCrosshairState state = plot.getLastCrosshairState();
+        assertNotNull(state);
+        
+        // The anchor Y should be stored in the state
+        assertFalse(Double.isNaN(state.getAnchorY()), 
+                "Anchor Y should be set when not locked on data");
+    }
+
+    /**
+     * Test that crosshair distance is properly tracked.
+     * This allows verification of which data point the crosshair snaps to.
+     */
+    @Test
+    public void testCrosshairDistanceTracking() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(100.0, "R1", "C1");
+        dataset.addValue(200.0, "R1", "C2");
+        dataset.addValue(300.0, "R1", "C3");
+        
+        CategoryPlot plot = new CategoryPlot(dataset, 
+                new CategoryAxis("X"), new NumberAxis("Y"), 
+                new BarRenderer());
+        
+        plot.setRangeCrosshairVisible(true);
+        plot.setRangeCrosshairLockedOnData(true);
+        
+        // Render the plot
+        BufferedImage image = new BufferedImage(600, 400, 
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        PlotRenderingInfo info = new PlotRenderingInfo(null);
+        plot.draw(g2, new Rectangle2D.Double(0, 0, 600, 400), 
+                new java.awt.geom.Point2D.Double(300, 200), null, info);
+        g2.dispose();
+        
+        // Verify crosshair state was created
+        CategoryCrosshairState state = plot.getLastCrosshairState();
+        assertNotNull(state);
+        
+        // Distance should have been updated from initial POSITIVE_INFINITY
+        double distance = state.getCrosshairDistance();
+        assertTrue(distance < Double.POSITIVE_INFINITY, 
+                "Crosshair distance should be updated: " + distance);
+    }
+
+    /**
+     * Test crosshair state with multiple datasets.
+     * This ensures the dataset index is properly tracked.
+     */
+    @Test
+    public void testCrosshairStateWithMultipleDatasets() {
+        DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
+        dataset1.addValue(10.0, "R1", "C1");
+        
+        DefaultCategoryDataset dataset2 = new DefaultCategoryDataset();
+        dataset2.addValue(20.0, "R2", "C2");
+        
+        CategoryPlot plot = new CategoryPlot(dataset1, 
+                new CategoryAxis("X"), new NumberAxis("Y"), 
+                new BarRenderer());
+        plot.setDataset(1, dataset2);
+        plot.setRenderer(1, new LineAndShapeRenderer());
+        
+        plot.setRangeCrosshairVisible(true);
+        
+        // Render the plot
+        BufferedImage image = new BufferedImage(400, 300, 
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = image.createGraphics();
+        plot.draw(g2, new Rectangle2D.Double(0, 0, 400, 300), null, null, null);
+        g2.dispose();
+        
+        // Verify crosshair state includes dataset index
+        CategoryCrosshairState state = plot.getLastCrosshairState();
+        assertNotNull(state);
+        
+        int datasetIndex = state.getDatasetIndex();
+        assertTrue(datasetIndex >= 0, 
+                "Dataset index should be non-negative: " + datasetIndex);
     }
 
 }

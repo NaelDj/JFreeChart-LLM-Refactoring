@@ -103,7 +103,7 @@ public class CombinedDomainCategoryPlotTest implements ChartChangeListener {
                         new EventListenerList())
                 .withPrefabValues(String.class, "A", "B")
                 .withPrefabValues(AttributedString.class, TestUtils.createAS(true), TestUtils.createAS(false))
-                .withIgnoredFields("chart", "parent") // superclass
+                .withIgnoredFields("chart", "parent", "lastCrosshairState") // superclass
                 .verify();
     }
 

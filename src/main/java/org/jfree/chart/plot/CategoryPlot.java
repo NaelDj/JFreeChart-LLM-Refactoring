@@ -259,6 +259,12 @@ public class CategoryPlot extends Plot implements ValueAxisPlot, Pannable,
      */
     private transient Paint rangeZeroBaselinePaint;
 
+    /** 
+     * The last crosshair state from rendering (for testing observability).
+     * @since 2.0
+     */
+    private CategoryCrosshairState lastCrosshairState;
+
     /**
      * A flag that controls whether the grid-lines for the range axis are
      * visible.
@@ -2986,6 +2992,18 @@ public class CategoryPlot extends Plot implements ValueAxisPlot, Pannable,
     }
 
     /**
+     * Returns the last crosshair state from rendering. This exposes the
+     * internal crosshair calculations for testing purposes.
+     *
+     * @return The last crosshair state (possibly {@code null}).
+     * 
+     * @since 2.0
+     */
+    public CategoryCrosshairState getLastCrosshairState() {
+        return this.lastCrosshairState;
+    }
+
+    /**
      * Returns the list of annotations.
      *
      * @return The list of annotations (never {@code null}).
@@ -3445,6 +3463,9 @@ public class CategoryPlot extends Plot implements ValueAxisPlot, Pannable,
                 drawOutline(g2, dataArea);
             }
         }
+
+        // Store crosshair state for testing observability
+        this.lastCrosshairState = crosshairState;
 
     }
 

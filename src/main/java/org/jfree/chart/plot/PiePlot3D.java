@@ -567,6 +567,22 @@ public class PiePlot3D extends PiePlot implements Serializable {
     }
 
     /**
+     * Returns the paint to use for drawing pie section sides, potentially 
+     * modified based on the darkerSides setting.
+     * 
+     * @param basePaint  the base paint for the section.
+     * @return The paint to use for the sides (possibly darkened).
+     * 
+     * @since 2.0
+     */
+    protected Paint getModifiedPaintForSides(Paint basePaint) {
+        if (getDarkerSides()) {
+            return PaintAlpha.darker(basePaint);
+        }
+        return basePaint;
+    }
+
+    /**
      * Draws the side of a pie section.
      *
      * @param g2  the graphics device.
@@ -591,9 +607,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
                             boolean drawFront,
                             boolean drawBack) {
 
-        if (getDarkerSides()) {
-             paint = PaintAlpha.darker(paint);
-        }
+        paint = getModifiedPaintForSides(paint);
 
         double start = arc.getAngleStart();
         double extent = arc.getAngleExtent();
@@ -957,7 +971,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
      *
      * @return A boolean.
      */
-    private boolean isAngleAtFront(double angle) {
+    protected boolean isAngleAtFront(double angle) {
         return (Math.sin(Math.toRadians(angle)) < 0.0);
     }
 
@@ -970,7 +984,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
      *
      * @return {@code true} if the angle is at the back of the pie.
      */
-    private boolean isAngleAtBack(double angle) {
+    protected boolean isAngleAtBack(double angle) {
         return (Math.sin(Math.toRadians(angle)) > 0.0);
     }
 

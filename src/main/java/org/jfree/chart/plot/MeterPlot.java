@@ -1046,6 +1046,38 @@ public class MeterPlot extends Plot implements Serializable, Cloneable {
     }
 
     /**
+     * Calculates the start and end points for a tick mark at the specified value.
+     * This method performs the coordinate calculations without any drawing operations,
+     * making the calculation logic testable and observable.
+     *
+     * @param meterArea  the meter area.
+     * @param value  the tick value.
+     *
+     * @return The tick endpoints (never {@code null}).
+     */
+    protected TickEndpoints calculateTickEndpoints(Rectangle2D meterArea, double value) {
+        double valueAngle = valueToAngle(value);
+        
+        double meterMiddleX = meterArea.getCenterX();
+        double meterMiddleY = meterArea.getCenterY();
+        
+        double radius = (meterArea.getWidth() / 2) + DEFAULT_BORDER_SIZE;
+        double radius1 = radius - 15;
+        
+        double valueP1X = meterMiddleX
+                + (radius * Math.cos(Math.PI * (valueAngle / 180)));
+        double valueP1Y = meterMiddleY
+                - (radius * Math.sin(Math.PI * (valueAngle / 180)));
+        
+        double valueP2X = meterMiddleX
+                + (radius1 * Math.cos(Math.PI * (valueAngle / 180)));
+        double valueP2Y = meterMiddleY
+                - (radius1 * Math.sin(Math.PI * (valueAngle / 180)));
+        
+        return new TickEndpoints(valueP1X, valueP1Y, valueP2X, valueP2Y);
+    }
+
+    /**
      * Draws a tick on the dial.
      *
      * @param g2  the graphics device.
@@ -1058,30 +1090,13 @@ public class MeterPlot extends Plot implements Serializable, Cloneable {
 
         double valueAngle = valueToAngle(value);
 
-        double meterMiddleX = meterArea.getCenterX();
-        double meterMiddleY = meterArea.getCenterY();
-
         g2.setPaint(this.tickPaint);
         g2.setStroke(new BasicStroke(2.0f));
 
-        double valueP2X;
-        double valueP2Y;
-
-        double radius = (meterArea.getWidth() / 2) + DEFAULT_BORDER_SIZE;
-        double radius1 = radius - 15;
-
-        double valueP1X = meterMiddleX
-                + (radius * Math.cos(Math.PI * (valueAngle / 180)));
-        double valueP1Y = meterMiddleY
-                - (radius * Math.sin(Math.PI * (valueAngle / 180)));
-
-        valueP2X = meterMiddleX
-                + (radius1 * Math.cos(Math.PI * (valueAngle / 180)));
-        valueP2Y = meterMiddleY
-                - (radius1 * Math.sin(Math.PI * (valueAngle / 180)));
-
-        Line2D.Double line = new Line2D.Double(valueP1X, valueP1Y, valueP2X,
-                valueP2Y);
+        TickEndpoints endpoints = calculateTickEndpoints(meterArea, value);
+        
+        Line2D.Double line = new Line2D.Double(endpoints.getX1(), endpoints.getY1(), 
+                endpoints.getX2(), endpoints.getY2());
         g2.draw(line);
 
         if (this.tickLabelsVisible && label) {
@@ -1094,8 +1109,8 @@ public class MeterPlot extends Plot implements Serializable, Cloneable {
             Rectangle2D tickLabelBounds
                 = TextUtils.getTextBounds(tickLabel, g2, fm);
 
-            double x = valueP2X;
-            double y = valueP2Y;
+            double x = endpoints.getX2();
+            double y = endpoints.getY2();
             if (valueAngle == 90 || valueAngle == 270) {
                 x = x - tickLabelBounds.getWidth() / 2;
             }

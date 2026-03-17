@@ -2164,10 +2164,11 @@ public class PiePlot<K extends Comparable<K>> extends Plot implements Cloneable,
      *
      * @param g2  the graphics device.
      * @param plotArea  the plot area.
-     * @param info  chart rendering info.
+     * @param info  the plot rendering info.
+     * @return the state after drawing (since 1.5.6).
      */
-    protected void drawPie(Graphics2D g2, Rectangle2D plotArea,
-                           PlotRenderingInfo info) {
+    protected PiePlotState drawPie(Graphics2D g2, Rectangle2D plotArea,
+            PlotRenderingInfo info) {
 
         PiePlotState state = initialise(g2, plotArea, this, null, info);
 
@@ -2290,6 +2291,7 @@ public class PiePlot<K extends Comparable<K>> extends Plot implements Cloneable,
         else {
             drawNoDataMessage(g2, plotArea);
         }
+        return state;
     }
 
     /**

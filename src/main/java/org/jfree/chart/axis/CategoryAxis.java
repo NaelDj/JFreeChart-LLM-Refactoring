@@ -917,6 +917,55 @@ public class CategoryAxis extends Axis implements Cloneable, Serializable {
     }
 
     /**
+     * Calculates the bounds for a category label at the specified position.
+     * This method exposes the coordinate calculations for testing observability.
+     *
+     * @param categoryIndex  the category index.
+     * @param categoryCount  the number of categories.
+     * @param dataArea  the area inside the axes ({@code null} not permitted).
+     * @param edge  the axis location ({@code null} not permitted).
+     * @param state  the axis state ({@code null} not permitted).
+     *
+     * @return The calculated bounds (never {@code null}).
+     */
+    public CategoryLabelBounds calculateCategoryLabelBounds(int categoryIndex,
+            int categoryCount, Rectangle2D dataArea, RectangleEdge edge,
+            AxisState state) {
+
+        double x0 = 0.0;
+        double x1 = 0.0;
+        double y0 = 0.0;
+        double y1 = 0.0;
+        
+        if (edge == RectangleEdge.TOP) {
+            x0 = getCategoryStart(categoryIndex, categoryCount, dataArea, edge);
+            x1 = getCategoryEnd(categoryIndex, categoryCount, dataArea, edge);
+            y1 = state.getCursor() - this.categoryLabelPositionOffset;
+            y0 = y1 - state.getMax();
+        }
+        else if (edge == RectangleEdge.BOTTOM) {
+            x0 = getCategoryStart(categoryIndex, categoryCount, dataArea, edge);
+            x1 = getCategoryEnd(categoryIndex, categoryCount, dataArea, edge);
+            y0 = state.getCursor() + this.categoryLabelPositionOffset;
+            y1 = y0 + state.getMax();
+        }
+        else if (edge == RectangleEdge.LEFT) {
+            y0 = getCategoryStart(categoryIndex, categoryCount, dataArea, edge);
+            y1 = getCategoryEnd(categoryIndex, categoryCount, dataArea, edge);
+            x1 = state.getCursor() - this.categoryLabelPositionOffset;
+            x0 = x1 - state.getMax();
+        }
+        else if (edge == RectangleEdge.RIGHT) {
+            y0 = getCategoryStart(categoryIndex, categoryCount, dataArea, edge);
+            y1 = getCategoryEnd(categoryIndex, categoryCount, dataArea, edge);
+            x0 = state.getCursor() + this.categoryLabelPositionOffset;
+            x1 = x0 - state.getMax();
+        }
+        
+        return new CategoryLabelBounds(x0, x1, y0, y1);
+    }
+
+    /**
      * Draws the category labels and returns the updated axis state.
      *
      * @param g2  the graphics device ({@code null} not permitted).
@@ -950,44 +999,12 @@ public class CategoryAxis extends Axis implements Cloneable, Serializable {
 
             CategoryLabelPosition position
                     = this.categoryLabelPositions.getLabelPosition(edge);
-            double x0 = 0.0;
-            double x1 = 0.0;
-            double y0 = 0.0;
-            double y1 = 0.0;
-            if (edge == RectangleEdge.TOP) {
-                x0 = getCategoryStart(categoryIndex, ticks.size(), dataArea, 
-                        edge);
-                x1 = getCategoryEnd(categoryIndex, ticks.size(), dataArea, 
-                        edge);
-                y1 = state.getCursor() - this.categoryLabelPositionOffset;
-                y0 = y1 - state.getMax();
-            }
-            else if (edge == RectangleEdge.BOTTOM) {
-                x0 = getCategoryStart(categoryIndex, ticks.size(), dataArea, 
-                        edge);
-                x1 = getCategoryEnd(categoryIndex, ticks.size(), dataArea, 
-                        edge);
-                y0 = state.getCursor() + this.categoryLabelPositionOffset;
-                y1 = y0 + state.getMax();
-            }
-            else if (edge == RectangleEdge.LEFT) {
-                y0 = getCategoryStart(categoryIndex, ticks.size(), dataArea, 
-                        edge);
-                y1 = getCategoryEnd(categoryIndex, ticks.size(), dataArea,
-                        edge);
-                x1 = state.getCursor() - this.categoryLabelPositionOffset;
-                x0 = x1 - state.getMax();
-            }
-            else if (edge == RectangleEdge.RIGHT) {
-                y0 = getCategoryStart(categoryIndex, ticks.size(), dataArea, 
-                        edge);
-                y1 = getCategoryEnd(categoryIndex, ticks.size(), dataArea,
-                        edge);
-                x0 = state.getCursor() + this.categoryLabelPositionOffset;
-                x1 = x0 - state.getMax();
-            }
-            Rectangle2D area = new Rectangle2D.Double(x0, y0, (x1 - x0),
-                    (y1 - y0));
+            
+            // Use the extracted calculation method for observability
+            CategoryLabelBounds labelBounds = calculateCategoryLabelBounds(
+                    categoryIndex, ticks.size(), dataArea, edge, state);
+            
+            Rectangle2D area = labelBounds.toRectangle();
             Point2D anchorPoint = position.getCategoryAnchor().getAnchorPoint(area);
             TextBlock block = tick.getLabel();
             block.draw(g2, (float) anchorPoint.getX(),

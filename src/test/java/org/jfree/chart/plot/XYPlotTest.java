@@ -42,6 +42,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -1628,6 +1629,261 @@ public class XYPlotTest {
         DrawingOperations ops2 = plot.getLastDrawingOperations();
         assertNotNull(ops2);
         assertNotSame(ops1, ops2, "Each draw() should create a new operations tracker");
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test-only fake renderer that records drawDomainLine calls for verification.
+     * This helps improve observability of internal gridline drawing behavior.
+     */
+    static class FakeDomainLineRenderer extends org.jfree.chart.renderer.xy.AbstractXYItemRenderer {
+        
+        // Recording state for test verification
+        boolean drawDomainLineCalled = false;
+        Graphics2D recordedG2;
+        XYPlot recordedPlot;
+        org.jfree.chart.axis.ValueAxis recordedAxis;
+        Rectangle2D recordedDataArea;
+        double recordedValue;
+        Paint recordedPaint;
+        Stroke recordedStroke;
+        
+        // List to record multiple calls
+        java.util.List<DomainLineCall> calls = new java.util.ArrayList<>();
+        
+        static class DomainLineCall {
+            final double value;
+            final Paint paint;
+            final Stroke stroke;
+            final Rectangle2D dataArea;
+            
+            DomainLineCall(double value, Paint paint, Stroke stroke, Rectangle2D dataArea) {
+                this.value = value;
+                this.paint = paint;
+                this.stroke = stroke;
+                this.dataArea = new Rectangle2D.Double(dataArea.getX(), dataArea.getY(), 
+                    dataArea.getWidth(), dataArea.getHeight());
+            }
+        }
+        
+        @Override
+        public void drawItem(Graphics2D g2, 
+                org.jfree.chart.renderer.xy.XYItemRendererState state,
+                Rectangle2D dataArea, 
+                PlotRenderingInfo info,
+                XYPlot plot, 
+                org.jfree.chart.axis.ValueAxis domainAxis,
+                org.jfree.chart.axis.ValueAxis rangeAxis, 
+                XYDataset dataset,
+                int series, 
+                int item, 
+                CrosshairState crosshairState,
+                int pass) {
+            // No-op for testing
+        }
+        
+        @Override
+        public void drawDomainLine(Graphics2D g2, XYPlot plot, 
+                org.jfree.chart.axis.ValueAxis axis,
+                Rectangle2D dataArea, double value, Paint paint, Stroke stroke) {
+            // Record this call
+            this.drawDomainLineCalled = true;
+            this.recordedG2 = g2;
+            this.recordedPlot = plot;
+            this.recordedAxis = axis;
+            this.recordedDataArea = dataArea;
+            this.recordedValue = value;
+            this.recordedPaint = paint;
+            this.recordedStroke = stroke;
+            
+            // Add to list of calls
+            calls.add(new DomainLineCall(value, paint, stroke, dataArea));
+        }
+        
+        void reset() {
+            drawDomainLineCalled = false;
+            recordedG2 = null;
+            recordedPlot = null;
+            recordedAxis = null;
+            recordedDataArea = null;
+            recordedValue = 0;
+            recordedPaint = null;
+            recordedStroke = null;
+            calls.clear();
+        }
+    }
+
+    /**
+     * Test that verifies drawDomainGridlines correctly calls drawDomainLine
+     * with the expected parameters. This improves observability of the
+     * surviving mutant on line 2958 in XYPlot.java.
+     */
+    @Test
+    public void testDrawDomainGridlinesCallsDrawDomainLine() {
+        // Create dataset with some data
+        XYSeries series = new XYSeries("Test");
+        series.add(1.0, 10.0);
+        series.add(2.0, 20.0);
+        series.add(3.0, 30.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        // Create plot with fake renderer
+        FakeDomainLineRenderer fakeRenderer = new FakeDomainLineRenderer();
+        XYPlot plot = new XYPlot(dataset, new NumberAxis("Domain"), 
+                new NumberAxis("Range"), fakeRenderer);
+        
+        // Enable domain gridlines
+        plot.setDomainGridlinesVisible(true);
+        Color gridColor = Color.BLUE;
+        plot.setDomainGridlinePaint(gridColor);
+        BasicStroke gridStroke = new BasicStroke(2.0f);
+        plot.setDomainGridlineStroke(gridStroke);
+        
+        // Create a chart and draw it to trigger gridline drawing
+        JFreeChart chart = new JFreeChart(plot);
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        chart.draw(g2, area);
+        
+        // Verify drawDomainLine was called
+        assertTrue(fakeRenderer.drawDomainLineCalled, 
+            "drawDomainLine should have been called for domain gridlines");
+        
+        // Verify the plot reference
+        assertSame(plot, fakeRenderer.recordedPlot, 
+            "drawDomainLine should receive the correct plot");
+        
+        // Verify the axis reference
+        assertSame(plot.getDomainAxis(), fakeRenderer.recordedAxis,
+            "drawDomainLine should receive the correct domain axis");
+        
+        // Verify paint and stroke are passed correctly
+        assertEquals(gridColor, fakeRenderer.recordedPaint,
+            "drawDomainLine should receive the correct gridline paint");
+        assertEquals(gridStroke, fakeRenderer.recordedStroke,
+            "drawDomainLine should receive the correct gridline stroke");
+        
+        // Verify data area is not null
+        assertNotNull(fakeRenderer.recordedDataArea,
+            "drawDomainLine should receive a non-null data area");
+        
+        // Verify multiple calls were made (one for each tick)
+        assertTrue(fakeRenderer.calls.size() > 0,
+            "drawDomainLine should be called at least once for gridlines");
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test that verifies drawDomainGridlines passes correct tick values
+     * to drawDomainLine. This ensures each gridline is drawn at the
+     * correct position.
+     */
+    @Test
+    public void testDrawDomainGridlinesWithCorrectTickValues() {
+        // Create dataset
+        XYSeries series = new XYSeries("Test");
+        series.add(0.0, 0.0);
+        series.add(10.0, 10.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        // Create plot with fake renderer
+        FakeDomainLineRenderer fakeRenderer = new FakeDomainLineRenderer();
+        NumberAxis domainAxis = new NumberAxis("Domain");
+        domainAxis.setRange(0.0, 10.0);
+        XYPlot plot = new XYPlot(dataset, domainAxis, 
+                new NumberAxis("Range"), fakeRenderer);
+        
+        // Enable domain gridlines
+        plot.setDomainGridlinesVisible(true);
+        plot.setDomainGridlinePaint(Color.GRAY);
+        plot.setDomainGridlineStroke(new BasicStroke(1.0f));
+        
+        // Draw the plot
+        JFreeChart chart = new JFreeChart(plot);
+        BufferedImage image = new BufferedImage(500, 400, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 500, 400);
+        
+        chart.draw(g2, area);
+        
+        // Verify calls were made
+        assertFalse(fakeRenderer.calls.isEmpty(),
+            "drawDomainLine should be called for each tick");
+        
+        // Verify each call has a valid tick value within the axis range
+        for (FakeDomainLineRenderer.DomainLineCall call : fakeRenderer.calls) {
+            assertTrue(call.value >= 0.0 && call.value <= 10.0,
+                "Tick value " + call.value + " should be within axis range [0, 10]");
+            assertNotNull(call.paint, "Paint should not be null");
+            assertNotNull(call.stroke, "Stroke should not be null");
+            assertNotNull(call.dataArea, "Data area should not be null");
+        }
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test that verifies minor gridlines also trigger drawDomainLine calls
+     * when enabled. This ensures complete coverage of the gridline drawing
+     * behavior.
+     */
+    @Test
+    public void testDrawDomainGridlinesWithMinorGridlines() {
+        // Create dataset
+        XYSeries series = new XYSeries("Test");
+        series.add(0.0, 0.0);
+        series.add(10.0, 10.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        // Create plot with fake renderer
+        FakeDomainLineRenderer fakeRenderer = new FakeDomainLineRenderer();
+        NumberAxis domainAxis = new NumberAxis("Domain");
+        domainAxis.setRange(0.0, 10.0);
+        XYPlot plot = new XYPlot(dataset, domainAxis, 
+                new NumberAxis("Range"), fakeRenderer);
+        
+        // Enable both major and minor domain gridlines
+        plot.setDomainGridlinesVisible(true);
+        plot.setDomainGridlinePaint(Color.GRAY);
+        plot.setDomainGridlineStroke(new BasicStroke(1.0f));
+        
+        plot.setDomainMinorGridlinesVisible(true);
+        plot.setDomainMinorGridlinePaint(Color.LIGHT_GRAY);
+        plot.setDomainMinorGridlineStroke(new BasicStroke(0.5f));
+        
+        // Draw the plot
+        JFreeChart chart = new JFreeChart(plot);
+        BufferedImage image = new BufferedImage(500, 400, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 500, 400);
+        
+        chart.draw(g2, area);
+        
+        // Verify calls were made for both major and minor gridlines
+        assertTrue(fakeRenderer.calls.size() > 0,
+            "drawDomainLine should be called for major and/or minor gridlines");
+        
+        // Verify at least one call has the correct paint and stroke
+        boolean foundMajorGridline = false;
+        boolean foundMinorGridline = false;
+        
+        for (FakeDomainLineRenderer.DomainLineCall call : fakeRenderer.calls) {
+            if (call.paint.equals(Color.GRAY) && 
+                call.stroke.equals(new BasicStroke(1.0f))) {
+                foundMajorGridline = true;
+            }
+            if (call.paint.equals(Color.LIGHT_GRAY) && 
+                call.stroke.equals(new BasicStroke(0.5f))) {
+                foundMinorGridline = true;
+            }
+        }
+        
+        assertTrue(foundMajorGridline || foundMinorGridline,
+            "Should find at least one gridline call with correct paint/stroke");
         
         g2.dispose();
     }

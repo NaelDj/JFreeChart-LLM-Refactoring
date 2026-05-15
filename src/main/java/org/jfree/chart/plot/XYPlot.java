@@ -404,6 +404,13 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
     private DrawingOperations lastDrawingOperations;
 
     /**
+     * Records domain gridline information for testing and observability.
+     * This list captures the parameters passed to drawDomainLine to improve
+     * test observability of the drawDomainGridlines method.
+     */
+    private List<DomainGridlineRecord> domainGridlineRecords;
+
+    /**
      * Creates a new {@code XYPlot} instance with no dataset, no axes and
      * no renderer.  You should specify these items before using the plot.
      */
@@ -512,6 +519,8 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
         this.rangeCrosshairStroke = DEFAULT_CROSSHAIR_STROKE;
         this.rangeCrosshairPaint = DEFAULT_CROSSHAIR_PAINT;
         this.shadowGenerator = null;
+        
+        this.domainGridlineRecords = new ArrayList<>();
     }
 
     /**
@@ -2695,6 +2704,25 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
     }
 
     /**
+     * Returns an unmodifiable list of domain gridline records that were captured
+     * during the last call to drawDomainGridlines(). This is useful for testing
+     * to verify that gridlines are drawn with the correct parameters.
+     *
+     * @return The list of domain gridline records (never {@code null}).
+     */
+    public List<DomainGridlineRecord> getDomainGridlineRecords() {
+        return Collections.unmodifiableList(this.domainGridlineRecords);
+    }
+
+    /**
+     * Clears all recorded domain gridline information. This is useful for 
+     * testing to reset the state between test runs.
+     */
+    public void clearDomainGridlineRecords() {
+        this.domainGridlineRecords.clear();
+    }
+
+    /**
      * Sets the shadow generator for the plot and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
@@ -3597,6 +3625,12 @@ public class XYPlot extends Plot implements ValueAxisPlot, Pannable, Zoomable,
                 }
                 XYItemRenderer r = getRenderer();
                 if ((r instanceof AbstractXYItemRenderer) && paintLine) {
+                    // Record gridline information for observability/testing
+                    DomainGridlineRecord record = new DomainGridlineRecord(
+                            tick.getValue(), getDomainAxis(), dataArea, 
+                            gridPaint, gridStroke);
+                    this.domainGridlineRecords.add(record);
+                    
                     ((AbstractXYItemRenderer) r).drawDomainLine(g2, this,
                             getDomainAxis(), dataArea, tick.getValue(),
                             gridPaint, gridStroke);

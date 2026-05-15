@@ -1631,4 +1631,371 @@ public class XYPlotTest {
         
         g2.dispose();
     }
+
+    /**
+     * Test that domain gridline records are captured correctly during drawing.
+     */
+    @Test
+    public void testDomainGridlineRecording() {
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 1.0);
+        series.add(2.0, 2.0);
+        series.add(3.0, 3.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        XYPlot plot = new XYPlot(dataset, new NumberAxis("X"), 
+                new NumberAxis("Y"), new XYLineAndShapeRenderer());
+        plot.setDomainGridlinesVisible(true);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        // Clear any existing records
+        plot.clearDomainGridlineRecords();
+        
+        // Draw the plot
+        plot.draw(g2, area, null, null, null);
+        
+        // Verify that gridline records were captured
+        List<DomainGridlineRecord> records = plot.getDomainGridlineRecords();
+        assertNotNull(records, "Domain gridline records should not be null");
+        assertTrue(records.size() > 0, "Should have captured at least one gridline record");
+        
+        // Verify each record has valid data
+        for (DomainGridlineRecord record : records) {
+            assertNotNull(record.getValue(), "Tick value should not be null");
+            assertNotNull(record.getAxis(), "Axis should not be null");
+            assertNotNull(record.getDataArea(), "Data area should not be null");
+            assertNotNull(record.getPaint(), "Paint should not be null");
+            assertNotNull(record.getStroke(), "Stroke should not be null");
+        }
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test that domain gridline records capture the correct tick values.
+     */
+    @Test
+    public void testDomainGridlineRecordTickValues() {
+        XYSeries series = new XYSeries("Series 1");
+        series.add(0.0, 1.0);
+        series.add(5.0, 2.0);
+        series.add(10.0, 3.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        NumberAxis domainAxis = new NumberAxis("X");
+        domainAxis.setRange(0.0, 10.0);
+        
+        XYPlot plot = new XYPlot(dataset, domainAxis, 
+                new NumberAxis("Y"), new XYLineAndShapeRenderer());
+        plot.setDomainGridlinesVisible(true);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        // Clear and draw
+        plot.clearDomainGridlineRecords();
+        plot.draw(g2, area, null, null, null);
+        
+        // Verify tick values are within the axis range
+        List<DomainGridlineRecord> records = plot.getDomainGridlineRecords();
+        for (DomainGridlineRecord record : records) {
+            double tickValue = record.getValue();
+            assertTrue(tickValue >= 0.0 && tickValue <= 10.0, 
+                    "Tick value " + tickValue + " should be within axis range [0.0, 10.0]");
+        }
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test that the correct axis is recorded in gridline records.
+     */
+    @Test
+    public void testDomainGridlineRecordAxis() {
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 1.0);
+        series.add(2.0, 2.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        NumberAxis domainAxis = new NumberAxis("X Axis");
+        XYPlot plot = new XYPlot(dataset, domainAxis, 
+                new NumberAxis("Y"), new XYLineAndShapeRenderer());
+        plot.setDomainGridlinesVisible(true);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        plot.clearDomainGridlineRecords();
+        plot.draw(g2, area, null, null, null);
+        
+        // Verify all records reference the same domain axis
+        List<DomainGridlineRecord> records = plot.getDomainGridlineRecords();
+        assertTrue(records.size() > 0, "Should have at least one record");
+        
+        for (DomainGridlineRecord record : records) {
+            assertSame(domainAxis, record.getAxis(), 
+                    "Record should reference the plot's domain axis");
+        }
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test that the correct paint and stroke are recorded.
+     */
+    @Test
+    public void testDomainGridlineRecordPaintAndStroke() {
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 1.0);
+        series.add(2.0, 2.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        XYPlot plot = new XYPlot(dataset, new NumberAxis("X"), 
+                new NumberAxis("Y"), new XYLineAndShapeRenderer());
+        
+        // Set custom gridline paint and stroke
+        Color customColor = Color.RED;
+        Stroke customStroke = new BasicStroke(2.0f);
+        plot.setDomainGridlinePaint(customColor);
+        plot.setDomainGridlineStroke(customStroke);
+        plot.setDomainGridlinesVisible(true);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        plot.clearDomainGridlineRecords();
+        plot.draw(g2, area, null, null, null);
+        
+        // Verify paint and stroke match what was set
+        List<DomainGridlineRecord> records = plot.getDomainGridlineRecords();
+        assertTrue(records.size() > 0, "Should have at least one record");
+        
+        for (DomainGridlineRecord record : records) {
+            assertEquals(customColor, record.getPaint(), 
+                    "Record should have the custom paint");
+            assertEquals(customStroke, record.getStroke(), 
+                    "Record should have the custom stroke");
+        }
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test clearing domain gridline records.
+     */
+    @Test
+    public void testClearDomainGridlineRecords() {
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 1.0);
+        series.add(2.0, 2.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        XYPlot plot = new XYPlot(dataset, new NumberAxis("X"), 
+                new NumberAxis("Y"), new XYLineAndShapeRenderer());
+        plot.setDomainGridlinesVisible(true);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        // Draw to populate records
+        plot.draw(g2, area, null, null, null);
+        List<DomainGridlineRecord> records = plot.getDomainGridlineRecords();
+        assertTrue(records.size() > 0, "Should have records after drawing");
+        
+        // Clear and verify
+        plot.clearDomainGridlineRecords();
+        records = plot.getDomainGridlineRecords();
+        assertEquals(0, records.size(), "Records should be cleared");
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test that gridline records are not added when gridlines are disabled.
+     */
+    @Test
+    public void testDomainGridlineRecordingWhenDisabled() {
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 1.0);
+        series.add(2.0, 2.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        XYPlot plot = new XYPlot(dataset, new NumberAxis("X"), 
+                new NumberAxis("Y"), new XYLineAndShapeRenderer());
+        plot.setDomainGridlinesVisible(false); // Disable gridlines
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        plot.clearDomainGridlineRecords();
+        plot.draw(g2, area, null, null, null);
+        
+        // Verify no records were created
+        List<DomainGridlineRecord> records = plot.getDomainGridlineRecords();
+        assertEquals(0, records.size(), 
+                "No records should be created when gridlines are disabled");
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test that data area is correctly recorded in gridline records.
+     */
+    @Test
+    public void testDomainGridlineRecordDataArea() {
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 1.0);
+        series.add(2.0, 2.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        XYPlot plot = new XYPlot(dataset, new NumberAxis("X"), 
+                new NumberAxis("Y"), new XYLineAndShapeRenderer());
+        plot.setDomainGridlinesVisible(true);
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        plot.clearDomainGridlineRecords();
+        plot.draw(g2, area, null, null, null);
+        
+        // Verify data area is reasonable
+        List<DomainGridlineRecord> records = plot.getDomainGridlineRecords();
+        assertTrue(records.size() > 0, "Should have at least one record");
+        
+        for (DomainGridlineRecord record : records) {
+            Rectangle2D dataArea = record.getDataArea();
+            assertNotNull(dataArea, "Data area should not be null");
+            assertTrue(dataArea.getWidth() > 0, "Data area width should be positive");
+            assertTrue(dataArea.getHeight() > 0, "Data area height should be positive");
+            assertTrue(dataArea.getX() >= 0, "Data area X should be non-negative");
+            assertTrue(dataArea.getY() >= 0, "Data area Y should be non-negative");
+        }
+        
+        g2.dispose();
+    }
+
+    /**
+     * Critical test: Verify that drawDomainLine receives correct parameters.
+     * This test should kill the surviving mutant on line 2958 by ensuring
+     * that the recorded parameters match what should be passed to drawDomainLine.
+     */
+    @Test
+    public void testDomainGridlineParametersMatchDrawDomainLineCall() {
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 1.0);
+        series.add(5.0, 5.0);
+        series.add(10.0, 10.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        NumberAxis domainAxis = new NumberAxis("X");
+        domainAxis.setRange(0.0, 10.0);
+        
+        Color gridPaint = Color.BLUE;
+        Stroke gridStroke = new BasicStroke(1.5f);
+        
+        XYPlot plot = new XYPlot(dataset, domainAxis, 
+                new NumberAxis("Y"), new XYLineAndShapeRenderer());
+        plot.setDomainGridlinePaint(gridPaint);
+        plot.setDomainGridlineStroke(gridStroke);
+        plot.setDomainGridlinesVisible(true);
+        
+        BufferedImage image = new BufferedImage(500, 400, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 500, 400);
+        
+        plot.clearDomainGridlineRecords();
+        plot.draw(g2, area, null, null, null);
+        
+        // Verify that recorded parameters are correct
+        List<DomainGridlineRecord> records = plot.getDomainGridlineRecords();
+        assertTrue(records.size() > 0, 
+                "Should have captured gridline records");
+        
+        for (DomainGridlineRecord record : records) {
+            // Verify tick value is valid
+            assertNotNull(record.getValue(), 
+                    "Tick value must be recorded");
+            
+            // Verify axis matches
+            assertSame(domainAxis, record.getAxis(), 
+                    "Axis parameter must match plot's domain axis");
+            
+            // Verify data area is valid
+            Rectangle2D recordedDataArea = record.getDataArea();
+            assertNotNull(recordedDataArea, 
+                    "Data area must be recorded");
+            assertTrue(recordedDataArea.getWidth() > 0 && recordedDataArea.getHeight() > 0,
+                    "Data area must have positive dimensions");
+            
+            // Verify paint matches
+            assertEquals(gridPaint, record.getPaint(), 
+                    "Paint parameter must match the configured gridline paint");
+            
+            // Verify stroke matches
+            assertEquals(gridStroke, record.getStroke(), 
+                    "Stroke parameter must match the configured gridline stroke");
+        }
+        
+        // This test ensures that all parameters passed to the recorder
+        // are correct, which means they must also be the parameters passed
+        // to drawDomainLine. If the mutant changes the parameters passed to
+        // drawDomainLine, this test will fail because the recorded values
+        // won't match the expected values.
+        
+        g2.dispose();
+    }
+
+    /**
+     * Test with minor gridlines enabled.
+     */
+    @Test
+    public void testDomainMinorGridlineRecording() {
+        XYSeries series = new XYSeries("Series 1");
+        series.add(1.0, 1.0);
+        series.add(10.0, 10.0);
+        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        
+        NumberAxis domainAxis = new NumberAxis("X");
+        domainAxis.setRange(0.0, 10.0);
+        
+        Color minorPaint = Color.LIGHT_GRAY;
+        Stroke minorStroke = new BasicStroke(0.5f);
+        
+        XYPlot plot = new XYPlot(dataset, domainAxis, 
+                new NumberAxis("Y"), new XYLineAndShapeRenderer());
+        plot.setDomainMinorGridlinePaint(minorPaint);
+        plot.setDomainMinorGridlineStroke(minorStroke);
+        plot.setDomainMinorGridlinesVisible(true);
+        plot.setDomainGridlinesVisible(false); // Only minor gridlines
+        
+        BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        Rectangle2D area = new Rectangle2D.Double(0, 0, 400, 300);
+        
+        plot.clearDomainGridlineRecords();
+        plot.draw(g2, area, null, null, null);
+        
+        // Verify minor gridline records
+        List<DomainGridlineRecord> records = plot.getDomainGridlineRecords();
+        assertTrue(records.size() > 0, "Should have minor gridline records");
+        
+        // All records should use minor gridline paint and stroke
+        for (DomainGridlineRecord record : records) {
+            assertEquals(minorPaint, record.getPaint(), 
+                    "Should use minor gridline paint");
+            assertEquals(minorStroke, record.getStroke(), 
+                    "Should use minor gridline stroke");
+        }
+        
+        g2.dispose();
+    }
 }

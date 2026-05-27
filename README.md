@@ -5,6 +5,8 @@ JFreeChart
 
 This repository is a thesis replication repository based on JFreeChart 1.5.6. The original JFreeChart README is kept below.
 
+The full replication package is available here: https://github.com/NaelDj/Mutation-LLM-Refactoring
+
 The `base` branch contains the JFreeChart version used as the starting point for the thesis runs. Compared to the original project, this branch includes replication-related setup changes:
 
 - the `pitest-maven` plugin was added to `pom.xml`, using PIT version 1.21.1 and the JUnit 5 PIT plugin version 1.2.3;

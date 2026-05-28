@@ -14,7 +14,9 @@ The `base` branch contains the JFreeChart version used as the starting point for
 - a `tools` folder was added with scripts for running tests and PIT mutation testing;
 - baseline PIT reports were included under `pit/pit-reports-before`.
 
-The branches `run_1` to `run_6` correspond to the six JFreeChart runs analysed in the thesis. Each run branch contains the production-code and test-code changes produced during that run.
+The branches `run_1` to `run_6` correspond to the six JFreeChart runs analysed in the thesis. Each run branch contains the production-code and test-code changes produced during that run. These branches also include the PIT report generated after the run under `pit/pit-reports-after`.
+
+The branches `run_1_follow_up_1` and `run_1_follow_up_2` correspond to the follow-up analysis in the thesis section "Follow-up Analysis of Selected Surviving Mutants".
 
 The project remains licensed under the GNU Lesser General Public License version 2.1 or later, as stated in the original JFreeChart license file.
 
